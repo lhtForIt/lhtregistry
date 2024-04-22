@@ -1,0 +1,30 @@
+### 获取所有服务实例
+GET http://localhost:8084/findAll?service=io.github.lhtforit.lhtrpc.UserService
+
+### 注册一个实例
+POST http://localhost:8084/register?service=io.github.lhtforit.lhtrpc.UserService
+Content-Type: application/json
+
+{
+  "context": "lhtrpc",
+  "host": "127.0.0.1",
+  "port": 8081,
+  "scheme": "http",
+  "status": false,
+  "parameters": {
+    "env": "dev",
+    "tag": "RED"
+  }
+}
+
+
+### 取消注册一个实例
+POST http://localhost:8084/unregister?service=io.github.lhtforit.lhtrpc.UserService
+Content-Type: application/json
+
+{
+  "context": "lhtrpc",
+  "host": "127.0.0.1",
+  "port": 8082,
+  "scheme": "http"
+}
