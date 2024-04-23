@@ -27,7 +27,7 @@ public class LhtRegistryService implements RegistryService {
 
     public final static Map<String, Long> TIMESTAMPS = new ConcurrentHashMap<>();
 
-    final static AtomicLong VERSION = new AtomicLong(0);
+    public final static AtomicLong VERSION = new AtomicLong(0);
 
 
     @Override

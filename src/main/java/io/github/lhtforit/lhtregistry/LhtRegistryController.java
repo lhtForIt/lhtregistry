@@ -1,5 +1,7 @@
 package io.github.lhtforit.lhtregistry;
 
+import io.github.lhtforit.lhtregistry.cluster.Cluster;
+import io.github.lhtforit.lhtregistry.cluster.Server;
 import io.github.lhtforit.lhtregistry.model.InstanceMeta;
 import io.github.lhtforit.lhtregistry.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,9 @@ public class LhtRegistryController {
 
     @Autowired
     private RegistryService registryService;
+
+    @Autowired
+    private Cluster cluster;
 
     @RequestMapping("/register")
     public InstanceMeta register(@RequestParam String service, @RequestBody InstanceMeta instance){
@@ -65,6 +70,30 @@ public class LhtRegistryController {
         return registryService.versions(services);
     }
 
+    @RequestMapping("/info")
+    public Server self(){
+        log.info(" ===> info: {}", cluster.self());
+        return cluster.self();
+    }
+
+    @RequestMapping("/cluster")
+    public List<Server> cluster() {
+        log.info(" ===> info: {}", cluster.getServers());
+        return cluster.getServers();
+    }
+
+    @RequestMapping("/leader")
+    public Server leader() {
+        log.info(" ===> leader: {}", cluster.leader());
+        return cluster.leader();
+    }
+
+    @RequestMapping("/sl")
+    public Server sl() {
+        cluster.self().setLeader(true);
+        log.info(" ===> leader: {}", cluster.self());
+        return cluster.self();
+    }
 
 
 }

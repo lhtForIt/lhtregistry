@@ -42,7 +42,7 @@ public class LhtHealthChecker implements HealthChecker{
                     LhtRegistryService.TIMESTAMPS.remove(serviceAndInstance);
                 }
             });
-        }, timeout, timeout, TimeUnit.SECONDS);
+        }, 10, 10, TimeUnit.SECONDS);
     }
 
     @Override

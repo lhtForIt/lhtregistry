@@ -28,3 +28,36 @@ Content-Type: application/json
   "port": 8082,
   "scheme": "http"
 }
+
+
+### renew一个实例8081
+POST http://localhost:8484/renew?service=io.github.kimmking.kkrpc.UserService
+Content-Type: application/json
+
+{
+  "context": "lhtrpc",
+  "host": "127.0.0.1",
+  "port": 8081,
+  "scheme": "http"
+}
+
+
+### 获取服务的版本
+POST http://localhost:8084/version?service=io.github.lhtforit.lhtrpc.UserService
+
+
+### self
+GET http://localhost:8084/info
+### cluster
+GET http://localhost:8084/cluster
+### self 85
+GET http://localhost:8085/info
+### self 86
+GET http://localhost:8086/info
+### cluster 85
+GET http://localhost:8085/cluster
+### sl 85
+GET http://localhost:8086/sl
+
+### cluster 86
+GET http://localhost:8086/cluster
