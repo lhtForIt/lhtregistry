@@ -30,10 +30,6 @@ public class Cluster {
     @Getter
     private List<Server> servers;
 
-    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-
-    int timeout = 5_000;
-
     String host;
 
     @Value("${server.port:8084}")
@@ -56,6 +52,11 @@ public class Cluster {
         MYSELF = new Server("http://" + host + ":" + port, true, false, -1L);
         log.debug(" ===> MYSELF = " + MYSELF);
 
+        initServers();
+        new ServerHealth(this).healthCheck();
+    }
+
+    private void initServers() {
         List<Server> servers = new ArrayList<>();
         for (String url : lhtRegistryConfigProperties.getServerList()) {
             if (url.contains("localhost")) {
@@ -70,85 +71,12 @@ public class Cluster {
             }
         }
         this.servers = servers;
-
-        executor.scheduleAtFixedRate(() -> {
-            try {
-                //服务探活
-                updateServers();
-                electLeader();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, 0, timeout, TimeUnit.MILLISECONDS);
-
     }
 
-    private void electLeader() {
-        List<Server> masters = this.servers.stream().filter(Server::isStatus).filter(Server::isLeader).collect(Collectors.toList());
-        if (masters.isEmpty()) {
-            log.debug(" ===>>> &&&&&& elect for no leader: " + servers);
-            elect();
-        } else if (masters.size() > 1) {
-            log.debug(" ===>>> &&&&&& elect for more than one leader: " + servers);
-            elect();
-        } else {//只有一个leader，do nothing
-            log.debug(" ===>>> no need election for leader: " + masters.get(0));
-        }
+    public Server self(){
+        MYSELF.setVersion(LhtRegistryService.VERSION.get());
+        return MYSELF;
     }
-
-    /**
-     * 节点选举有以下几种方法：
-     * 我们暂时用第一种方式实现
-     * 1.各种节点自己选，算法保证大家选的是同一个
-     * 2.外部有一个分布式锁，谁拿到锁，谁是主
-     * 3.分布式一致性算法，比如paxos,raft，，很复杂
-     */
-    private void elect() {
-
-        Server candidate = null;
-        //初始化候选者
-        for (Server server : servers) {
-            server.setLeader(false);
-            if (server.isStatus()) {
-                if (candidate == null) {
-                    candidate = server;
-                } else {
-                    if (candidate.hashCode() > server.hashCode()) {//一开始准备写成server.getVersion() > candidate.getVersion()这样，但是可能出现版本相等的情况，会有问题，所以改成hashcode
-                        candidate = server;
-                    }
-                }
-            }
-        }
-
-        //确认主
-        if (candidate != null) {
-            candidate.setLeader(true);
-            log.debug(" ===>>> elect for leader: " + candidate);
-        } else {
-            log.debug(" ===>>> elect failed for no leaders: " + servers);
-        }
-
-    }
-
-    private void updateServers() {
-        this.servers.forEach(server -> {
-            try {
-                Server serverInfo = HttpInvoker.httpGet(server.getUrl()+"/info", Server.class);
-                log.debug(" ===>>> health check success for " + serverInfo);
-                if (serverInfo != null) {
-                    server.setStatus(true);//调用成功就一定是活着的
-                    server.setVersion(serverInfo.getVersion());
-                    server.setLeader(serverInfo.isLeader());
-                }
-            } catch (Exception e) {
-                log.debug(" ===>>> health check failed for " + server);
-                server.setStatus(false);
-                server.setLeader(false);
-            }
-        });
-    }
-
-    public Server self(){return MYSELF; }
 
     public Server leader(){
         return this.servers.stream().filter(Server::isStatus).filter(Server::isLeader).findFirst().orElse(null);

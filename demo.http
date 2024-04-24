@@ -8,7 +8,7 @@ Content-Type: application/json
 {
   "context": "lhtrpc",
   "host": "127.0.0.1",
-  "port": 8081,
+  "port": 8083,
   "scheme": "http",
   "status": false,
   "parameters": {
@@ -31,13 +31,13 @@ Content-Type: application/json
 
 
 ### renew一个实例8081
-POST http://localhost:8484/renew?service=io.github.kimmking.kkrpc.UserService
+POST http://localhost:8084/renew?service=io.github.kimmking.kkrpc.UserService
 Content-Type: application/json
 
 {
   "context": "lhtrpc",
   "host": "127.0.0.1",
-  "port": 8081,
+  "port": 8089,
   "scheme": "http"
 }
 

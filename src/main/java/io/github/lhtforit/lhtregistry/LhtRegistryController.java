@@ -2,7 +2,9 @@ package io.github.lhtforit.lhtregistry;
 
 import io.github.lhtforit.lhtregistry.cluster.Cluster;
 import io.github.lhtforit.lhtregistry.cluster.Server;
+import io.github.lhtforit.lhtregistry.cluster.Snapshot;
 import io.github.lhtforit.lhtregistry.model.InstanceMeta;
+import io.github.lhtforit.lhtregistry.service.LhtRegistryService;
 import io.github.lhtforit.lhtregistry.service.RegistryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +34,20 @@ public class LhtRegistryController {
     @RequestMapping("/register")
     public InstanceMeta register(@RequestParam String service, @RequestBody InstanceMeta instance){
         log.info(" ===> register {} @ {}", service, instance);
+        checkLeader();//TODO 可以做成直接转发给主而不报错
         return registryService.register(service, instance);
+    }
+
+    private void checkLeader() {
+        if(!cluster.self().isLeader()) {
+            throw new RuntimeException("current server is not a leader, the leader is " + cluster.leader().getUrl());
+        }
     }
 
     @RequestMapping("/unregister")
     public InstanceMeta unregister(@RequestParam String service, @RequestBody InstanceMeta instance) {
         log.info(" ===> unregister {} @ {}", service, instance);
+        checkLeader();
         return registryService.unregister(service, instance);
     }
 
@@ -50,6 +60,7 @@ public class LhtRegistryController {
     @RequestMapping("/renew")
     public long renew(@RequestBody InstanceMeta instance, @RequestParam String service) {
         log.info(" ===> renew {} @ {}", service, instance);
+        checkLeader();
         return registryService.renew(instance, service);
     }
 
@@ -57,6 +68,7 @@ public class LhtRegistryController {
     @RequestMapping("/renews")
     public long renews(@RequestBody InstanceMeta instance, @RequestParam String services) {
         log.info(" ===> renew {} @ {}", services, instance);
+        checkLeader();
         return registryService.renew(instance, services.split(","));
     }
 
@@ -74,6 +86,13 @@ public class LhtRegistryController {
     public Server self(){
         log.info(" ===> info: {}", cluster.self());
         return cluster.self();
+    }
+
+    @RequestMapping("/snapshot")
+    public Snapshot snapshot(){
+        Snapshot snapshot = LhtRegistryService.snapshot();
+        log.info(" ===> snapshot: {}", snapshot);
+        return snapshot;
     }
 
     @RequestMapping("/cluster")
