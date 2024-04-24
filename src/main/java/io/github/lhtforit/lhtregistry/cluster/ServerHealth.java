@@ -47,15 +47,20 @@ public class ServerHealth {
     }
 
     private void syncFromLeader() {
-        Server leader = cluster.leader();
-        Server self = cluster.self();
-        log.debug(" ===>>> leader version: " + leader.getVersion() + ", my version: " + self.getVersion());
-        if (!self.isLeader() && self.getVersion() < leader.getVersion()) {
-            log.debug(" ===>>> sync snapshot from leader: " + leader);
-            Snapshot snapshot = HttpInvoker.httpGet(leader.getUrl() + "/snapshot", Snapshot.class);
-            log.debug(" ===>>> sync and restore snapshot: " + snapshot);
-            LhtRegistryService.restore(snapshot);
+        try {
+            Server leader = cluster.leader();
+            Server self = cluster.self();
+            log.debug(" ===>>> leader version: " + leader.getVersion() + ", my version: " + self.getVersion());
+            if (!self.isLeader() && self.getVersion() < leader.getVersion()) {
+                log.debug(" ===>>> sync snapshot from leader: " + leader);
+                Snapshot snapshot = HttpInvoker.httpGet(leader.getUrl() + "/snapshot", Snapshot.class);
+                log.debug(" ===>>> sync and restore snapshot: " + snapshot);
+                LhtRegistryService.restore(snapshot);
+            }
+        }catch (Exception e){
+            log.info(" ===>>> syncFromLeader failed: " + e.getMessage());
         }
+
     }
 
 
