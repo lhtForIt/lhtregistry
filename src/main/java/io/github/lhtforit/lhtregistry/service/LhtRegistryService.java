@@ -33,7 +33,7 @@ public class LhtRegistryService implements RegistryService {
     @Override
     public synchronized InstanceMeta register(String serviceName, InstanceMeta instance) {
         List<InstanceMeta> metas = REGISTRY.computeIfAbsent(serviceName, k -> new ArrayList<>());
-        convertHost(instance);
+//        convertHost(instance);
         if (metas.contains(instance)) {
             log.info(" ====> instance {} already registered", instance.toUrl());
             instance.setStatus(true);
@@ -75,7 +75,7 @@ public class LhtRegistryService implements RegistryService {
     @Override
     public synchronized long renew(InstanceMeta instance, String... services) {
         long now = System.currentTimeMillis();
-        convertHost(instance);
+//        convertHost(instance);
         for (String service : services) {
             TIMESTAMPS.put(service + "@" + instance.toUrl(), now);
         }

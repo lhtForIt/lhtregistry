@@ -1,5 +1,6 @@
 package io.github.lhtforit.lhtregistry;
 
+import io.github.lhtforit.lhtregistry.model.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

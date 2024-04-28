@@ -1,5 +1,5 @@
 ### 获取所有服务实例
-GET http://localhost:8084/findAll?service=io.github.lhtforit.lhtrpc.UserService
+GET http://localhost:8084/findAll?service=lht-app_public_dev_com.lht.lhtrpc.demo.api.UserService
 
 ### 注册一个实例
 POST http://localhost:8084/register?service=io.github.lhtforit.lhtrpc.UserService

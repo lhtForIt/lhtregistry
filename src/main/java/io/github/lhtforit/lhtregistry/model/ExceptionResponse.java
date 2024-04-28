@@ -1,4 +1,4 @@
-package io.github.lhtforit.lhtregistry;
+package io.github.lhtforit.lhtregistry.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
